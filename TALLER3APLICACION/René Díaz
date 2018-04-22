@@ -1,0 +1,63 @@
+
+library(shiny)
+library(tidyverse)
+library(DT)
+library(ggplot2)
+
+
+shinyUI(fluidPage(
+  
+    tabsetPanel (tabPanel("Informacion", 
+                        titlePanel("ACCIDENTES DE TRANSITO"),
+                        fluidRow(column(DT::dataTableOutput("contenido")
+                                        ,width=12))
+                        ),
+               tabPanel("Grafico",
+                        sidebarLayout(sidebarPanel("Seccion II: Graficos"),
+                                      mainPanel(
+                                      plotOutput("graph1")
+                                      
+                                      
+                                      )
+                                        )
+                        )
+               )
+    
+))
+
+
+
+library(shiny)
+library(tidyverse)
+library(DT)
+
+# Define server logic required to draw a histogram
+shinyServer(function(input, output) {
+   
+ output$contenido <- DT::renderDataTable(
+      DT::datatable({  
+       transito 
+  },
+  options = list(lengthMenu=list(c(7,15,-1),c('10','20','All')),
+                  pageLength=15),
+  filter="top",
+  selection = 'multiple',
+  style='bootstrap'
+   ))
+
+
+     output$graph1 <- renderPlot({
+     
+       ggplot(data=victi, aes(x=Provincias, y=Victimas, fill=Zona)) +
+         geom_bar(stat="identity", position=position_dodge())+
+         geom_text(aes(label=Victimas), vjust=1.6, color="white",
+                   position = position_dodge(0.9), size=3.5)+
+         labs(caption="Fuente:INEC")+  
+         scale_fill_brewer(palette="Paired")+
+         theme_minimal()+
+         ggtitle("PROVINCIAS CON MAS ACCIDENTES DE TRANSITO")+theme(plot.title = element_text(hjust = 0.5))
+    
+  
+                             })
+})
+
